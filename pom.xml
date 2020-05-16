@@ -16,7 +16,7 @@
 
     <modules>
         <module>Infinity-Common</module>
-        <module>Infinity-Paper</module>
+        <module>Infinity-Bukkit</module>
     </modules>
 
 
