@@ -1,8 +1,0 @@
-provider: zone.amy.infinity.peripherals.DistributedProvider
-mongo:
-  host: localhost
-  port: 27017
-  database: infinity
-redis:
-  host: localhost
-  port: 6379

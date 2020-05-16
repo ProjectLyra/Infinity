@@ -1,5 +1,0 @@
-name: InfinityLink
-author: Miss Moode
-version: 1.0-SNAPSHOT
-main: zone.amy.infinity.InfinityLink
-depend: [Infinity]

@@ -15,9 +15,8 @@
     </properties>
 
     <modules>
-        <module>Infinity-Base</module>
-        <module>Infinity-Head</module>
-        <module>Infinity-Bukkit</module>
+        <module>Infinity-Common</module>
+        <module>Infinity-Paper</module>
     </modules>
 
 
