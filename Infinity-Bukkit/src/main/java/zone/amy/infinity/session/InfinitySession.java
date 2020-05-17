@@ -23,7 +23,13 @@ public abstract class InfinitySession<
     protected abstract void onLoad();
     protected abstract void onUnload();
 
-    public abstract boolean canUserJoin(IOfflineUser player, MemberConfigurationType configuration);
-    public abstract void onMemberJoin(MemberType member, SessionMemberConfiguration configuration);
+    /**
+     *
+     * @param player The user requesting entry
+     * @param configuration The configuration passed with the entry request
+     * @return Whether the user can enter the session at this moment
+     */
+    public abstract boolean isUserAllowedEntry(IOfflineUser player, MemberConfigurationType configuration);
+    public abstract void onMemberJoin(MemberType member, MemberConfigurationType configuration);
     public abstract void onMemberLeave(MemberType user);
 }

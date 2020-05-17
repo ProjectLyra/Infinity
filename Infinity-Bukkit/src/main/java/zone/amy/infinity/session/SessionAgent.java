@@ -26,11 +26,6 @@ public class SessionAgent implements Listener, RepresentableObject<SessionIdenti
 
     // Delegation Methods
 
-    @SuppressWarnings("unchecked")
-    public boolean canUserJoin(IOfflineUser user, SessionMemberConfiguration configuration) {
-        return this.session.canUserJoin(user, configuration);
-    }
-
     public SessionState getState() {
         return this.session.getState();
     }
@@ -55,16 +50,23 @@ public class SessionAgent implements Listener, RepresentableObject<SessionIdenti
         router.routeWhenAvailable(user, configuration, this);
     }
 
+    // Local player routing methods
 
     @SuppressWarnings("unchecked")
-    public void addMember(Player player, SessionMemberConfiguration configuration) {
+    boolean isUserAllowedEntry(Player player, SessionMemberConfiguration configuration) {
+        return this.session.isUserAllowedEntry(new IOfflineUser(player.getUniqueId()), configuration);
+    }
+
+
+    @SuppressWarnings("unchecked")
+    void addMember(Player player, SessionMemberConfiguration configuration) {
         SessionMember member = this.session.constructMember(player);
         members.add(member);
         this.session.onMemberJoin(member, configuration);
     }
 
     @SuppressWarnings("unchecked")
-    public void removeMember(Player player) {
+    void removeMember(Player player) {
         SessionMember member = members.stream().filter(mem -> mem.getPlayer().equals(player)).findFirst().get();
         this.session.onMemberLeave(member);
         members.remove(member);
