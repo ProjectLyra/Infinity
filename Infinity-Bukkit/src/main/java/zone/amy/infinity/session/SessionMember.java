@@ -1,14 +1,16 @@
 package zone.amy.infinity.session;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.bukkit.entity.Player;
 import zone.amy.infinity.Infinity;
 
 @RequiredArgsConstructor
 public abstract class SessionMember {
-    private final SessionAgent agent;
-    @Getter private Player player;
+    @Setter(AccessLevel.PACKAGE) private SessionAgent agent;
+    @Getter private final Player player;
 
     public abstract boolean isVisibleTo(SessionMember member);
 

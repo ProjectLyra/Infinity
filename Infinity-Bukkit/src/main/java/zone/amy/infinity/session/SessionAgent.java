@@ -100,6 +100,7 @@ public class SessionAgent implements RepresentableObject<SessionIdentity> {
     @SuppressWarnings("unchecked")
     void addMember(Player player, SessionMemberConfiguration configuration) {
         SessionMember member = this.session.constructMember(player);
+        member.setAgent(this);
         members.put(player, member);
         this.session.onMemberJoin(member, configuration);
         member.updateSight();
