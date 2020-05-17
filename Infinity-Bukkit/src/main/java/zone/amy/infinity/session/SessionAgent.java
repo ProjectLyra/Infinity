@@ -8,10 +8,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import zone.amy.infinity.Infinity;
+import zone.amy.infinity.exception.SessionUserBusyException;
 import zone.amy.infinity.lib.RepresentableObject;
+import zone.amy.infinity.module.InfinityModule;
 import zone.amy.infinity.user.IOfflineUser;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -19,9 +23,11 @@ import java.util.Set;
  */
 @RequiredArgsConstructor
 public class SessionAgent implements Listener, RepresentableObject<SessionIdentity> {
-    private final PlayerRouter router;
+    private final SessionManager manager;
+    private final InfinityModule module;
     @Getter private final InfinitySession session;
 
+    private Map<IOfflineUser, SessionMemberConfiguration> incomingUserBuffer = new HashMap<>();
     private Set<SessionMember> members = new HashSet<>();
 
     // Delegation Methods
@@ -46,15 +52,55 @@ public class SessionAgent implements Listener, RepresentableObject<SessionIdenti
         this.session.onUnload();
     }
 
-    public void directUser(IOfflineUser user, SessionMemberConfiguration configuration) {
-        router.routeWhenAvailable(user, configuration, this);
+    /**
+     * Directs a free user to this session.If the user isn't logged in, they will be buffered to join this session when
+     * they do, superseding all previous buffers managed by this Infinity instance.
+     * @param user The user to direct
+     * @param configuration The configuration to pass to the session
+     * @return True if the user was immediately routed, false if they were buffered.
+     * @throws SessionUserBusyException When the user is currently in a different session within the manager.
+     */
+    public boolean directOrExpectUser(IOfflineUser user, SessionMemberConfiguration configuration) throws SessionUserBusyException {
+        Player player = module.getServer().getPlayer(user.getUuid());
+        if (player != null) {
+            if (manager.getCurrentSession(user) == null) {
+                addMember(player, configuration);
+                return true;
+            } else  {
+                throw new SessionUserBusyException();
+            }
+        } else {
+            SessionIdentity expectingSession = manager.getExpectingSession(user);
+            if (expectingSession != null) manager.getSessionInterface(expectingSession).stopExpecting(user);
+            incomingUserBuffer.put(user, configuration);
+            return false;
+        }
     }
+
+    public boolean isBuffered(IOfflineUser user) {
+        return incomingUserBuffer.containsKey(user);
+    }
+    public SessionMemberConfiguration stopExpecting(IOfflineUser user) {
+        return incomingUserBuffer.remove(user);
+    }
+
+    public boolean isMember(IOfflineUser user) {
+        for (SessionMember member : this.members) {
+            if (member.getPlayer().getUniqueId() == user.getUuid()) return true;
+        }
+        return false;
+    }
+
 
     // Local player routing methods
 
+    SessionMemberConfiguration getBufferedConfiguration(IOfflineUser user) {
+        return incomingUserBuffer.get(user);
+    }
+
     @SuppressWarnings("unchecked")
-    boolean isUserAllowedEntry(Player player, SessionMemberConfiguration configuration) {
-        return this.session.isUserAllowedEntry(new IOfflineUser(player.getUniqueId()), configuration);
+    boolean isUserAllowedEntry(IOfflineUser user, SessionMemberConfiguration configuration) {
+        return this.session.isUserAllowedEntry(user, configuration);
     }
 
 
