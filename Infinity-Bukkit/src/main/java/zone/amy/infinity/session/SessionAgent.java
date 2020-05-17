@@ -13,10 +13,7 @@ import zone.amy.infinity.lib.RepresentableObject;
 import zone.amy.infinity.module.InfinityModule;
 import zone.amy.infinity.user.IOfflineUser;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Acts as intervening layer between the Session and the surrounding plugin, handling things like member joining/leaving.
@@ -28,7 +25,7 @@ public class SessionAgent implements Listener, RepresentableObject<SessionIdenti
     @Getter private final InfinitySession session;
 
     private Map<IOfflineUser, SessionMemberConfiguration> incomingUserBuffer = new HashMap<>();
-    private Set<SessionMember> members = new HashSet<>();
+    private Map<Player, SessionMember> members = new HashMap<>();
 
     // Delegation Methods
 
@@ -85,10 +82,8 @@ public class SessionAgent implements Listener, RepresentableObject<SessionIdenti
     }
 
     public boolean isMember(IOfflineUser user) {
-        for (SessionMember member : this.members) {
-            if (member.getPlayer().getUniqueId() == user.getUuid()) return true;
-        }
-        return false;
+        Player player = module.getServer().getPlayer(user.getUuid());
+        return (player != null && members.containsKey(player));
     }
 
 
@@ -103,19 +98,27 @@ public class SessionAgent implements Listener, RepresentableObject<SessionIdenti
         return this.session.isUserAllowedEntry(user, configuration);
     }
 
-
     @SuppressWarnings("unchecked")
     void addMember(Player player, SessionMemberConfiguration configuration) {
         SessionMember member = this.session.constructMember(player);
-        members.add(member);
+        members.put(player, member);
         this.session.onMemberJoin(member, configuration);
+        member.updateSight();
     }
 
     @SuppressWarnings("unchecked")
     void removeMember(Player player) {
-        SessionMember member = members.stream().filter(mem -> mem.getPlayer().equals(player)).findFirst().get();
+        SessionMember member = members.get(player);
         this.session.onMemberLeave(member);
-        members.remove(member);
+        members.remove(player);
+    }
+
+    public Collection<SessionMember> getMemberList() {
+        return new HashSet<>(this.members.values());
+    }
+
+    public SessionMember getMember(Player player) {
+        return this.members.get(player);
     }
 
 

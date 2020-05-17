@@ -3,6 +3,7 @@ package zone.amy.infinity.session;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import zone.amy.infinity.Infinity;
@@ -11,6 +12,7 @@ import zone.amy.infinity.user.IOfflineUser;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class SessionManager {
     private Map<Class<? extends SessionConfiguration>, Class<? extends InfinitySession>> sessionClasses = new HashMap<>();

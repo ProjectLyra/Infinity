@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import zone.amy.infinity.module.InfinityModule;
+import zone.amy.infinity.session.IsolationListener;
 import zone.amy.infinity.session.SessionManager;
 
 /**
@@ -30,6 +31,7 @@ public class Infinity extends InfinityModule {
         }
 
         this.sessionManager = new SessionManager();
+        getServer().getPluginManager().registerEvents(new IsolationListener(sessionManager), this);
     }
     // Action Methods
 }
