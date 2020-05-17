@@ -8,12 +8,8 @@ import zone.amy.infinity.module.InfinityModule;
 
 @RequiredArgsConstructor
 public abstract class ModuleEvent extends Event {
-    private static final HandlerList handlers = new HandlerList();
+    @Getter private static final HandlerList handlerList = new HandlerList();
 
     @Getter private final InfinityModule module;
 
-    @Override
-    public HandlerList getHandlers() {
-        return handlers;
-    }
 }

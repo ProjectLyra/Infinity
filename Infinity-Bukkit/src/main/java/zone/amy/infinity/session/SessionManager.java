@@ -100,10 +100,5 @@ public class SessionManager {
             IOfflineUser user = new IOfflineUser(event.getPlayer().getUniqueId());
             sessionManager.getCurrentSession(user).removeMember(event.getPlayer());
         }
-        @EventHandler(priority = EventPriority.MONITOR)
-        public void playerKickEvent(PlayerKickEvent event) {
-            IOfflineUser user = new IOfflineUser(event.getPlayer().getUniqueId());
-            sessionManager.getCurrentSession(user).removeMember(event.getPlayer());
-        }
     }
 }
