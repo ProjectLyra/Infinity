@@ -27,7 +27,7 @@ public class SessionManager {
         sessionClasses.put(config, type);
     }
 
-    public SessionIdentity createSession(InfinityModule owner, SessionConfiguration configuration) {
+    public SessionAgent createSession(InfinityModule owner, SessionConfiguration configuration) {
         Class<? extends SessionConfiguration> configClass = configuration.getClass();
         try {
             if (sessionClasses.containsKey(configClass)) {
@@ -39,7 +39,7 @@ public class SessionManager {
 
                 sessions.put(session.getExternalRepresentation(), session);
 
-                return session.getExternalRepresentation();
+                return session;
             } else {
                 throw new IllegalStateException("No session code prepared for that configuration type!");
             }
