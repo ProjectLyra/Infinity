@@ -8,7 +8,6 @@ import java.util.UUID;
 
 @EqualsAndHashCode
 public class SessionIdentity implements ExternalRepresentation {
-    @Getter UUID uuid;
-    @Getter String name;
+    @Getter UUID uniqueId;
 
 }

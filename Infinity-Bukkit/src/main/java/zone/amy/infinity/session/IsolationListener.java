@@ -21,16 +21,10 @@ public class IsolationListener implements Listener {
 
     // TODO: Player hide/showing shite, w/ priority to allow for sessions to hide internal players from others -- isVisibleTo in the session code?
 
-    public SessionAgent getSession(IOfflineUser user) {
-        return sessionManager.getSessionInterface(
-                sessionManager.getCurrentSession(user)
-        );
-    }
-
     @EventHandler
     public void playerChatEvent(AsyncPlayerChatEvent event) {
         IOfflineUser user = new IOfflineUser((event.getPlayer().getUniqueId()));
-        SessionAgent session = getSession(user);
+        SessionAgent session = sessionManager.getCurrentSession(user);
 
         event.getRecipients().removeAll(
                 event.getRecipients().stream()

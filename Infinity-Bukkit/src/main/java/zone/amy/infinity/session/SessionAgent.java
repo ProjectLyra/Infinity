@@ -19,7 +19,7 @@ import java.util.*;
  * Acts as intervening layer between the Session and the surrounding plugin, handling things like member joining/leaving.
  */
 @RequiredArgsConstructor
-public class SessionAgent implements Listener, RepresentableObject<SessionIdentity> {
+public class SessionAgent implements RepresentableObject<SessionIdentity> {
     private final SessionManager manager;
     private final InfinityModule module;
     @Getter private final InfinitySession session;
@@ -41,7 +41,6 @@ public class SessionAgent implements Listener, RepresentableObject<SessionIdenti
     // Action Methods
 
     public void load() {
-        Infinity.getInstance().getServer().getPluginManager().registerEvents(this, Infinity.getInstance());
         this.session.onLoad();
     }
 
@@ -67,8 +66,8 @@ public class SessionAgent implements Listener, RepresentableObject<SessionIdenti
                 throw new SessionUserBusyException();
             }
         } else {
-            SessionIdentity expectingSession = manager.getExpectingSession(user);
-            if (expectingSession != null) manager.getSessionInterface(expectingSession).stopExpecting(user);
+            SessionAgent expectingSession = manager.getExpectingSession(user);
+            if (expectingSession != null) expectingSession.stopExpecting(user);
             incomingUserBuffer.put(user, configuration);
             return false;
         }
@@ -121,13 +120,4 @@ public class SessionAgent implements Listener, RepresentableObject<SessionIdenti
         return this.members.get(player);
     }
 
-
-    @EventHandler
-    public void playerQuitEvent(PlayerQuitEvent event) {
-        removeMember(event.getPlayer());
-    }
-    @EventHandler
-    public void playerKickEvent(PlayerKickEvent event) {
-        removeMember(event.getPlayer());
-    }
 }

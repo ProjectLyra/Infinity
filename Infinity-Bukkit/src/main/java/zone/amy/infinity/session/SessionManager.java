@@ -2,10 +2,9 @@ package zone.amy.infinity.session;
 
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.*;
 import zone.amy.infinity.Infinity;
 import zone.amy.infinity.module.InfinityModule;
 import zone.amy.infinity.user.IOfflineUser;
@@ -55,15 +54,15 @@ public class SessionManager {
         return sessions.get(session);
     }
 
-    public SessionIdentity getExpectingSession(IOfflineUser player) {
-        for (SessionIdentity session : sessions.keySet()) {
-            if (getSessionInterface(session).isBuffered(player)) return session;
+    public SessionAgent getExpectingSession(IOfflineUser player) {
+        for (SessionAgent session : sessions.values()) {
+            if (session.isBuffered(player)) return session;
         }
         return null;
     }
-    public SessionIdentity getCurrentSession(IOfflineUser player) {
-        for (SessionIdentity session : sessions.keySet()) {
-            if (getSessionInterface(session).isMember(player)) return session;
+    public SessionAgent getCurrentSession(IOfflineUser player) {
+        for (SessionAgent session : sessions.values()) {
+            if (session.isMember(player)) return session;
         }
         return null;
     }
@@ -72,32 +71,39 @@ public class SessionManager {
     private static class PlayerRouter implements Listener {
         private final SessionManager sessionManager;
 
-        @EventHandler
+        @EventHandler(priority = EventPriority.HIGHEST)
         public void playerLoginEvent(PlayerLoginEvent event) {
             IOfflineUser user = new IOfflineUser(event.getPlayer().getUniqueId());
-            SessionIdentity session = sessionManager.getExpectingSession(user);
+            SessionAgent session = sessionManager.getExpectingSession(user);
             if (session != null) {
-                SessionAgent agent = sessionManager.getSessionInterface(session);
-                if (agent.isBuffered(user)) {
-                    if (agent.isUserAllowedEntry(user, agent.getBufferedConfiguration(user))) {
-                        event.allow();
-                    } else {
-                        event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Session denied user entry.");
-                    }
+                if (session.isUserAllowedEntry(user, session.getBufferedConfiguration(user))) {
+                    event.allow();
+                } else {
+                    event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Session denied user entry.");
                 }
             } else {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "No sessions marked for user!");
             }
         }
 
-        @EventHandler
+        @EventHandler(priority = EventPriority.MONITOR)
         public void playerJoinEvent(PlayerJoinEvent event) {
             IOfflineUser user = new IOfflineUser(event.getPlayer().getUniqueId());
-            SessionIdentity session = sessionManager.getExpectingSession(user);
+            SessionAgent session = sessionManager.getExpectingSession(user);
             if (session != null) {
-                SessionAgent agent = sessionManager.getSessionInterface(session);
-                agent.addMember(event.getPlayer(), agent.stopExpecting(user));
+                session.addMember(event.getPlayer(), session.stopExpecting(user));
             }
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR)
+        public void playerQuitEvent(PlayerQuitEvent event) {
+            IOfflineUser user = new IOfflineUser(event.getPlayer().getUniqueId());
+            sessionManager.getCurrentSession(user).removeMember(event.getPlayer());
+        }
+        @EventHandler(priority = EventPriority.MONITOR)
+        public void playerKickEvent(PlayerKickEvent event) {
+            IOfflineUser user = new IOfflineUser(event.getPlayer().getUniqueId());
+            sessionManager.getCurrentSession(user).removeMember(event.getPlayer());
         }
     }
 }
