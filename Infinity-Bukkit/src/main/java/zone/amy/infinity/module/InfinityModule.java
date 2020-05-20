@@ -2,8 +2,6 @@ package zone.amy.infinity.module;
 
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
-import zone.amy.infinity.command.Command;
-import zone.amy.infinity.command.CommandHandler;
 import zone.amy.infinity.event.ModuleDisabledEvent;
 import zone.amy.infinity.event.ModuleEnabledEvent;
 
