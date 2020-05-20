@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Infinity.iml" filepath="$PROJECT_DIR$/Infinity.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Infinity-Bukkit/Infinity-Bukkit.iml" filepath="$PROJECT_DIR$/Infinity-Bukkit/Infinity-Bukkit.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Infinity-Common/Infinity-Common.iml" filepath="$PROJECT_DIR$/Infinity-Common/Infinity-Common.iml" />
+    </modules>
+  </component>
+</project>

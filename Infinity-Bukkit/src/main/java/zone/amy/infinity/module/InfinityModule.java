@@ -18,7 +18,6 @@ public class InfinityModule extends JavaPlugin {
     }
 
     @Getter private Meta meta;
-    @Getter private CommandHandler commandHandler;
 
     @Override
     public void onEnable() {
@@ -29,9 +28,6 @@ public class InfinityModule extends JavaPlugin {
         meta = getClass().getAnnotation(Meta.class);
         if (meta == null) throw new IllegalStateException(getClass().getName() + " was not annotated with metadata.");
 
-        // Introduce unique command handler for this module
-        commandHandler = new CommandHandler();
-        getServer().getPluginManager().registerEvents(commandHandler, this);
 
         try {
             onModuleEnable();
@@ -49,14 +45,6 @@ public class InfinityModule extends JavaPlugin {
         onModuleDisable();
         getServer().getPluginManager().callEvent(new ModuleDisabledEvent(this));
         getLogger().info("Gracefully disabled module \"" + getMeta().name() + "\"");
-    }
-
-    /* Delegated Methods */
-    public final void registerCommand(Class<? extends Command> command) {
-        commandHandler.registerCommand(command);
-    }
-    public final void unregisterCommand(Class<? extends Command> command) {
-        commandHandler.unregisterCommand(command);
     }
 
     /* Methods for Implementation */
