@@ -1,0 +1,66 @@
+name: Continuous Deployment
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  package:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 14
+
+      - name: Cache Dependencies
+        uses: actions/cache@v1
+        env:
+          cache-name: cache-maven-dependencies
+        with:
+          path: ~/.m2
+          key: ${{runner.os}}-build-${{env.cache-name}}-${{ hashFiles('**/pom.xml') }}
+
+      - name: Build Modules
+        run: mvn -B package --file pom.xml
+
+      - name: Obtain version number
+        id: pom
+        uses: mavrosxristoforos/get-xml-info@1.0
+        with:
+          xml-file: 'pom.xml'
+          xpath: '/*[local-name()="project"]/*[local-name()="version"]'
+
+      - name: Delete Tag and Release
+        uses: dev-drprasad/delete-tag-and-release@v0.1.2
+        with:
+          delete_release: true
+          tag_name: release-${{ steps.pom.outputs.info }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Create Release
+        id: create_release
+        if: always()
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          commit: ${{ github.sha }}
+          tag: release-${{ steps.pom.outputs.info }}
+          name: Release ${{ steps.pom.outputs.info }}
+          token: ${{ github.token }}
+          draft: false
+          prerelease: false
+          artifacts: Infinity-Bukkit/target/Luna-Bukkit.jar'
+          
+      - name: Dispatch Event to Images repo
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          repository: ProjectLyra/Docker-Images
+          event-type: notify-release-infinity
+          token: ${{ secrets.LYRA_ACCESS_TOKEN }}
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
