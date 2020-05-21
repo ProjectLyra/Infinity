@@ -55,7 +55,7 @@ jobs:
           token: ${{ github.token }}
           draft: false
           prerelease: false
-          artifacts: Infinity-Bukkit/target/Luna-Bukkit.jar'
+          artifacts: Infinity-Bukkit/target/Infinity-Bukkit.jar'
           
       - name: Dispatch Event to Images repo
         uses: peter-evans/repository-dispatch@v1
