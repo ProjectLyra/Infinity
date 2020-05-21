@@ -27,5 +27,8 @@
         <module>Infinity-Bukkit</module>
     </modules>
 
+    <build>
+        <finalName>${artifactId}</finalName>
+    </build>
 
 </project>
